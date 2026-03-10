@@ -1,0 +1,6 @@
+@TourHub.PaymentService_HostAddress = http://localhost:5191
+
+GET {{TourHub.PaymentService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

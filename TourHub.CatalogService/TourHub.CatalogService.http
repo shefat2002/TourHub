@@ -1,0 +1,6 @@
+@TourHub.CatalogService_HostAddress = http://localhost:5250
+
+GET {{TourHub.CatalogService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
