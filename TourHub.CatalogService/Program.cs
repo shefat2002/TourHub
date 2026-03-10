@@ -1,23 +1,22 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.WebHost.UseUrls("http://localhost:5011");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+var tours = new[]
 {
-    app.MapOpenApi();
-}
+    new { Id = 1, Name = "Sundarbans Safari", Price = 15000, Duration = "3 Days" },
+    new { Id = 2, Name = "Cox's Bazar Beach Resort", Price = 20000, Duration = "4 Days" },
+    new { Id = 3, Name = "Sylhet Tea Gardens", Price = 12000, Duration = "2 Days" }
+};
 
-app.UseHttpsRedirection();
+app.MapGet("/api/tours", () => tours);
 
-app.UseAuthorization();
-
-app.MapControllers();
+app.MapGet("/api/tours/{id}", (int id) => 
+{
+    var tour = tours.FirstOrDefault(t => t.Id == id);
+    return tour is null ? Results.NotFound() : Results.Ok(tour);
+});
 
 app.Run();
