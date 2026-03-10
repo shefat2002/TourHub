@@ -1,23 +1,22 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.WebHost.UseUrls("http://localhost:5013");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+var customers = new[]
 {
-    app.MapOpenApi();
-}
+    new { Id = 1, Name = "Rahim", Email = "rahim@example.com", LoyaltyPoints = 1200 },
+    new { Id = 2, Name = "Karim", Email = "karim@example.com", LoyaltyPoints = 850 },
+    new { Id = 3, Name = "Fatima", Email = "fatima@example.com", LoyaltyPoints = 300 }
+};
 
-app.UseHttpsRedirection();
+app.MapGet("/api/customers", () => customers);
 
-app.UseAuthorization();
-
-app.MapControllers();
+app.MapGet("/api/customers/{id}", (int id) => 
+{
+    var customer = customers.FirstOrDefault(c => c.Id == id);
+    return customer is null ? Results.NotFound() : Results.Ok(customer);
+});
 
 app.Run();

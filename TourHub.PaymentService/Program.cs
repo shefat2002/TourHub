@@ -1,23 +1,21 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.WebHost.UseUrls("http://localhost:5014");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+var payments = new[]
 {
-    app.MapOpenApi();
-}
+    new { PaymentId = "TXN-1001", BookingId = 101, Amount = 15000, Status = "Completed" },
+    new { PaymentId = "TXN-1002", BookingId = 102, Amount = 20000, Status = "Pending" }
+};
 
-app.UseHttpsRedirection();
+app.MapGet("/api/payments", () => payments);
 
-app.UseAuthorization();
-
-app.MapControllers();
+app.MapGet("/api/payments/{id}", (string id) => 
+{
+    var payment = payments.FirstOrDefault(p => p.PaymentId == id);
+    return payment is null ? Results.NotFound() : Results.Ok(payment);
+});
 
 app.Run();
