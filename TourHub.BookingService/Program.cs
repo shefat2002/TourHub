@@ -1,23 +1,30 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Force this service to run on port 5012
+builder.WebHost.UseUrls("http://localhost:5012");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Hardcoded mock data for our bookings
+var bookings = new[]
 {
-    app.MapOpenApi();
-}
+    new { BookingId = 101, TourId = 1, CustomerName = "Alice", Status = "Confirmed" },
+    new { BookingId = 102, TourId = 2, CustomerName = "Bob", Status = "Pending" }
+};
 
-app.UseHttpsRedirection();
+// Define our endpoints
+app.MapGet("/api/bookings", () => bookings);
 
-app.UseAuthorization();
+app.MapGet("/api/bookings/{id}", (int id) => 
+{
+    var booking = bookings.FirstOrDefault(b => b.BookingId == id);
+    return booking is null ? Results.NotFound() : Results.Ok(booking);
+});
 
-app.MapControllers();
+// A dummy POST endpoint to simulate creating a booking
+app.MapPost("/api/bookings", () => 
+{
+    return Results.Created("/api/bookings/103", new { Message = "Booking successful!" });
+});
 
 app.Run();
